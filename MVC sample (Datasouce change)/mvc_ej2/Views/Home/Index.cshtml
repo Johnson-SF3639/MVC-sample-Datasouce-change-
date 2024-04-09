@@ -1,0 +1,72 @@
+﻿@*@section ScriptsAtBottom {*@
+@{ 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var btnSearch = document.getElementById('btnSearch');
+            var grid = document.getElementById('DataOperations').ej2_instances[0];
+            console.log(grid);
+
+        btnSearch.addEventListener('click', function () {
+            var filterValue = document.getElementById('tbIndustryCode').value;
+                if (filterValue.length != 0) {
+                    var newUrl = '/Home/' + filterValue;
+                    console.log(newUrl);
+
+                    grid.dataSource = new ej.data.DataManager({ url: newUrl, adaptor: new ej.data.UrlAdaptor() });
+
+                    grid.refresh();   // Refresh the grid to fetch the updated data
+
+
+                    // Set the Data Source for the grid to a URL Adapter using the variable newUrl as the Url value.
+                    //
+                    // The c# code that I normally use to set the datasource looks like this:
+                    //
+                    // .DataSource(dataManager => { dataManager.Url("/Setup/DateTypeListUrlDatasource").Adaptor("UrlAdaptor"); })
+                    //
+                    // The controller action for the Url looks like this:
+                    //
+                    // public ActionResult DateTypeGridDataSource(DataManagerRequest dm)
+                    // {
+                    //
+                    // }
+                    //
+                    // How do I set the DataSource through javascript? So that the grid works with the same settings and options listed below.
+                    // The user may press the search button many times.
+                    //
+                    // Should I just rebuild the grid from scratch in JS and replace the contents of the DIV containing the grid?
+                }
+            });
+        });
+        function editRecord(args) {
+            window.location = "/setup/datetype/edit/" + args.rowData.DateTypeID;
+        }
+    </script>
+}
+
+<h1>Date Type List 2</h1>
+<row class="row">
+    <div class="small-12 medium-12 columns small-gutters">
+        <div class="row">
+            <div id="field-industrycode-div" class="small-12 required">
+                <label for="tbIndustryCode">Industry Code</label>
+                <input type="text" id="tbIndustryCode" name="tbIndustryCode" placeholder="" value="" />
+            </div>
+            <div>
+                <input type="button" id="btnSearch" name="btnSearch" placeholder="" value="Search" />
+            </div>
+        </div>
+    </div>
+</row>
+
+<div class="row">
+    <div class="small-12 medium-12 columns small-gutters">
+        <div class="row">
+            @Html.EJS().Grid("DataOperations").EditSettings(e => { e.AllowAdding(false).AllowEditing(false).AllowDeleting(false); }).Columns(col =>{
+
+           col.Field("OrderID").HeaderText("Order ID").Width("150").Filter(new { @operator = "greaterthanorequal" }).Add();
+           col.Field("CustomerID").HeaderText("Customer Name").Width("150").Filter(new { @operator = "contains" }).Add();
+           col.Field("ShipCountry").HeaderText("Ship Country").Width("150").Filter(new { @operator = "contains" }).Add();
+       }).AllowPaging().AllowSorting().AllowFiltering().RecordDoubleClick("editRecord").FilterSettings(filter => filter.Type(Syncfusion.EJ2.Grids.FilterType.FilterBar).ShowFilterBarOperator(true)).Render()
+        </div>
+    </div>
+</div>
